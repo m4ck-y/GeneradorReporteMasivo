@@ -9,3 +9,6 @@ Ejecutar proyecto
 
 
 -exportar librerias usadas
+
+
+- crear schemas pydantic
