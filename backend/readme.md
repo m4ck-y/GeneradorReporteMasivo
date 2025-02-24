@@ -1,5 +1,11 @@
 # Backend - Generador de Reportes Masivos
 
+## Requisitos Previos
+
+- Python 3.10 o superior
+- PostgreSQL 14 o superior
+- pip (gestor de paquetes de Python)
+
 ## Configuración del Entorno de Desarrollo
 
 ### 1. Crear y Activar Entorno Virtual
@@ -27,7 +33,7 @@ pip install pydantic
 # Exportar dependencias a requirements.txt
 pip freeze > requirements.txt
 
-# Instalar desde requirements.txt
+# O instalar todas las dependencias desde requirements.txt
 pip install -r requirements.txt
 ```
 
@@ -72,10 +78,12 @@ backend/
 # Ejecutar el seeder interactivo
 python seeder.py
 
-# Se solicitará:
-# - Número de registros maestros
-# - Número de detalles por maestro
-# - Año para los registros
+# El seeder solicitará:
+# - Número de registros maestros (default: 20)
+# - Número de detalles por maestro (default: 20)
+# - Año para los registros (default: 2025)
+
+# Nota: El seeder limpiará todos los registros existentes antes de generar nuevos datos
 ```
 
 ## Documentación API
