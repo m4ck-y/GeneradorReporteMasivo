@@ -67,6 +67,8 @@ backend/
 ├── seeder/           # Generadores de datos de prueba
 │   ├── generate_maestro.py
 │   └── generate_details.py
+├── tasks/            # Tareas y utilidades
+│   └── report_generator.py  # Generador de reportes
 ├── main.py          # Punto de entrada de la aplicación
 ├── seeder.py        # Script para generar datos de prueba
 └── requirements.txt  # Dependencias del proyecto
@@ -85,6 +87,18 @@ python seeder.py
 
 # Nota: El seeder limpiará todos los registros existentes antes de generar nuevos datos
 ```
+
+## Generación de Reportes
+
+El sistema permite generar diferentes tipos de reportes en formato CSV:
+
+### Tipos de Reportes
+1. **Reporte por Campaña**: Detalle completo de una campaña específica
+2. **Reporte por Fecha**: Genera reportes para todas las campañas de una fecha
+
+Los reportes se guardan en el directorio `reports/` con la siguiente nomenclatura:
+- Campaña: `campaign_[ID]_[TIMESTAMP].csv`
+- Resumen: `summary_report_[FECHA]_[TIMESTAMP].csv`
 
 ## Documentación API
 

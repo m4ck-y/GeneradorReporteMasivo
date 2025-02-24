@@ -4,6 +4,7 @@ from utils.fecha import convertir_fecha
 from models.database import Base, engine
 from models.ta_sms_detalle import TaSmsDetalle
 from models.ta_sms_maestro import TaSmsMaestro
+from models.report_status import ReporteEstado
 from api import setup_services
 
 app = FastAPI()
