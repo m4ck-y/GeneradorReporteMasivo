@@ -16,11 +16,11 @@ class ReporteService:
     def setup_routes(self):
         self.api_router.get('/')(self.reporte)
 
-    async def reporte(self,fecha: datetime.datetime = Depends(convertir_fecha)):
+    async def reporte(self,fecha: datetime.datetime = Depends(convertir_fecha), db = Depends(get_db)):
         "Genera un reporte CSV de todas las campañas en una fecha específica"
 
         try:
-            report_generator = ReportGenerator(get_db())
+            report_generator = ReportGenerator(db)
             file_path = report_generator.generate_by_date(fecha)
             return {"reporte generado": file_path}
         except Exception as e:

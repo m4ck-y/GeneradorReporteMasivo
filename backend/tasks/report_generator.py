@@ -28,6 +28,12 @@ class ReportGenerator:
                 TaSmsMaestro.fecha == date
             ).all()
 
+            if not campaigns:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"No se encontraron campañas para la fecha {date.strftime('%Y-%m-%d')}"
+                )
+
             with open(filepath, 'w', newline='', encoding='utf-8') as csvfile:
                 writer = csv.writer(csvfile)
                 
