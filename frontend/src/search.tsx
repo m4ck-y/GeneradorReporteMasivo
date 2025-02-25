@@ -1,50 +1,54 @@
-import React from 'react';
-import { AudioOutlined } from '@ant-design/icons';
-import { Input, Space } from 'antd';
-import type { GetProps } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { SearchOutlined } from '@ant-design/icons';
+import { Button, Flex, Select, Space, Tooltip } from 'antd';
+import { http } from './api/http';
+import { useCampanias } from './context/CampaniasContext';
 
-type SearchProps = GetProps<typeof Input.Search>;
+interface FechasResponse {
+  fechas: string[];
+  total: number;
+}
 
-const { Search } = Input;
+const SearchCard: React.FC = () => {
+  const [fechas, setFechas] = useState<string[]>([]);
+  const { buscarCampanias, setFechaSelected, fechaSelected } = useCampanias();
 
-const suffix = (
-  <AudioOutlined
-    style={{
-      fontSize: 16,
-      color: '#1677ff',
-    }}
-  />
-);
+  useEffect(() => {
+    http.get<FechasResponse>(`/campania/fechas`).then((response) => {
+      setFechas(response.value?.fechas || []);
+    });
+  }, []);
 
-const onSearch: SearchProps['onSearch'] = (value, _e, info) => console.log(info?.source, value);
+  const onSearch = () => {
+    if (fechaSelected) {
+      buscarCampanias(fechaSelected);
+    }
+  };
 
-const SearchCard: React.FC = () => (
-  <Space direction="vertical">
-    <Search placeholder="input search text" onSearch={onSearch} style={{ width: 200 }} />
-    <Search placeholder="input search text" allowClear onSearch={onSearch} style={{ width: 200 }} />
-    <Search
-      addonBefore="https://"
-      placeholder="input search text"
-      allowClear
-      onSearch={onSearch}
-      style={{ width: 304 }}
-    />
-    <Search placeholder="input search text" onSearch={onSearch} enterButton />
-    <Search
-      placeholder="input search text"
-      allowClear
-      enterButton="Search"
-      size="large"
-      onSearch={onSearch}
-    />
-    <Search
-      placeholder="input search text"
-      enterButton="Search"
-      size="large"
-      suffix={suffix}
-      onSearch={onSearch}
-    />
-  </Space>
-);
+  const handleChangeSelect = (value: string) => {
+    setFechaSelected(value);
+  };
+
+  return (
+    <Space direction="vertical">
+      <Flex wrap gap="small">
+        <Select
+          placeholder='Fechas disponibles'
+          style={{ width: 120 }}
+          onChange={handleChangeSelect}
+          options={fechas.map((fecha) => ({ value: fecha, label: fecha }))}
+        />
+        <Tooltip title="Buscar">
+          <Button 
+            type="primary" 
+            shape="circle" 
+            icon={<SearchOutlined />} 
+            onClick={onSearch}
+          />
+        </Tooltip>
+      </Flex>
+    </Space>
+  );
+};
 
 export default SearchCard;

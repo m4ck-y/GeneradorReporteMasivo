@@ -1,12 +1,17 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import TableComponent from './table.tsx'
 import SearchCard from './search.tsx'
+import { Space } from 'antd'
+import { CampaniasProvider } from './context/CampaniasContext.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <SearchCard />
-    <App />
+    <CampaniasProvider>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <SearchCard />
+        <TableComponent />
+      </Space>
+    </CampaniasProvider>
   </StrictMode>,
 )
