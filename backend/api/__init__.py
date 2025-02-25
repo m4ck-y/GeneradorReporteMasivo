@@ -7,11 +7,11 @@ def setup_services(api_server: FastAPI):
     ReporteService(api_server)
     CampaniaService(api_server)
 
-    # Definir las configuraciones de CORS
+    # Configuraciones de CORS
     api_server.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],  # Permite todos los orígenes. Puedes poner una lista con orígenes específicos, por ejemplo: ["https://tusitio.com"]
+        allow_origins=["*"],
         allow_credentials=True,
-        allow_methods=["*"],  # Permite todos los métodos HTTP (GET, POST, PUT, DELETE, etc.)
-        allow_headers=["*"],  # Permite todos los encabezados
+        allow_methods=["*"],
+        allow_headers=["*"],
     )

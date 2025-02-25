@@ -21,7 +21,7 @@ class ReporteService:
 
         try:
             report_generator = ReportGenerator(db)
-            file_path = report_generator.generate_by_date(fecha)
+            file_path = report_generator.generate_by_date(fecha.date())
             return {"reporte generado": file_path}
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))

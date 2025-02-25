@@ -30,7 +30,7 @@ class CampaniaService:
         
         # Convertir las fechas a formato ISO para JSON
         fechas_formateadas = [
-            fecha[0].strftime("%Y-%m-%d") 
+            fecha[0].strftime("%Y/%m/%d") 
             for fecha in fechas
         ]
         

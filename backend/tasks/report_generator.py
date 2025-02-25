@@ -23,6 +23,8 @@ class ReportGenerator:
             filename = f"report_date_{date.strftime('%Y%m%d')}_{timestamp}.csv"
             filepath = self.reports_dir / filename
 
+            print("Buscando campañas para la fecha", date)
+
             # Obtener campañas de la fecha
             campaigns = self.db.query(TaSmsMaestro).filter(
                 TaSmsMaestro.fecha == date
