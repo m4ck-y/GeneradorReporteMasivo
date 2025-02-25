@@ -102,14 +102,11 @@ class ReportGenerator:
 
             with open(filepath, 'w', newline='', encoding='utf-8') as csvfile:
                 writer = csv.writer(csvfile)
-                
-                # Escribir encabezado
                 writer.writerow([
                     "ID Campaña", "Nombre Campaña", "Fecha Campaña",
                     "Mensaje", "Estado Mensaje"
                 ])
                 
-                # Escribir detalles
                 for detail in details:
                     writer.writerow([
                         campaign.id,

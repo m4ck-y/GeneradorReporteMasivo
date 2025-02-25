@@ -18,14 +18,11 @@ class ReporteEstado(Base):
     fecha = Column(Date, nullable=False, comment="Fecha en la que se solicitó el reporte")
 
     # estado: Estado actual del reporte. Puede ser "Pendiente", "En proceso", "Completado" o "Error"
-    estado = Column(String(50), nullable=False, comment="Estado del reporte (Pendiente, En proceso, Completado, Error)")
+    estado = Column(String(50), nullable=False, comment="Estado del reporte (Pendiente, En proceso, Completado)")
 
     # ruta_archivo: Ruta (o URL) donde se encuentra almacenado el archivo CSV generado.
     # Este campo es opcional y se llenará cuando el reporte esté completado.
     ruta_archivo = Column(String(255), nullable=True, comment="Ruta del archivo CSV generado (si está disponible)")
-
-    # intentos: Número de reintentos en caso de fallo durante la generación del reporte.
-    intentos = Column(Integer, default=0, nullable=False, comment="Número de reintentos en caso de fallo en la generación del reporte")
 
     # timestamp: Fecha y hora de la última actualización de este registro.
     # Se actualiza automáticamente cada vez que se modifica la fila.
