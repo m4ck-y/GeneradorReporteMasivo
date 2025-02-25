@@ -2,11 +2,21 @@ from seeder.generate_maestro import seed_database
 from models.database import Base, engine, Session
 from models.ta_sms_maestro import TaSmsMaestro
 from models.ta_sms_detalle import TaSmsDetalle
+from datetime import datetime
 from sqlalchemy import text
 
-def get_input_with_default(prompt: str, default_value: str) -> str:
+def get_input_with_default(prompt: str, default_value: str, is_date: bool = False) -> str:
     """Solicita input al usuario con un valor por defecto"""
     user_input = input(f"{prompt} [{default_value}]: ").strip()
+    
+    if is_date and user_input:
+        try:
+            # Validar formato de fecha
+            datetime.strptime(user_input, '%y/%m/%d')
+        except ValueError:
+            print("Formato de fecha inválido. Usando valor por defecto.")
+            return default_value
+            
     return user_input if user_input else default_value
 
 def limpiar_tablas():
@@ -40,8 +50,16 @@ def run_seeder():
         # Limpiar registros existentes
         limpiar_tablas()
         
-        # Solicitar parámetros con valores por defecto
+        # Fecha actual en formato yy/mm/dd
+        fecha_actual = datetime.now().strftime('%y/%m/%d')
+        
         print("\nPor favor, ingrese los siguientes valores (o presione Enter para usar el valor por defecto):\n")
+        
+        fecha_str = get_input_with_default(
+            "Fecha para los registros (formato: yy/mm/dd)",
+            fecha_actual,
+            is_date=True
+        )
         
         num_maestros = int(get_input_with_default(
             "Número de registros maestros a generar",
@@ -53,23 +71,21 @@ def run_seeder():
             "20"
         ))
         
-        year = int(get_input_with_default(
-            "Año para los registros",
-            "2025"
-        ))
+        # Convertir string de fecha a objeto datetime
+        fecha = datetime.strptime(fecha_str, '%y/%m/%d').date()
         
         print("\nGenerando registros...")
+        print(f"- Fecha: {fecha.strftime('%Y-%m-%d')}")
         print(f"- {num_maestros} registros maestros")
-        print(f"- {num_detalles} detalles por cada maestro")
-        print(f"- Año: {year}\n")
+        print(f"- {num_detalles} detalles por cada maestro\n")
         
         # Ejecutar el seeder
-        seed_database(num_maestros, num_detalles, year)
+        seed_database(num_maestros, num_detalles, fecha)
         
         print("\n¡Proceso completado exitosamente!")
         
     except ValueError as e:
-        print("\nError: Por favor ingrese números válidos")
+        print("\nError: Por favor ingrese valores válidos")
     except Exception as e:
         print(f"\nError durante la ejecución: {str(e)}")
 

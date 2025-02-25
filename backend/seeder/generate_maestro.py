@@ -81,20 +81,18 @@ def generar_descripcion(nombre):
     tipo = next((k for k in tipos_campanas.keys() if k in nombre), "Promoción")
     return random.choice(descripciones[tipo])
 
-def generar_registros(num_registros: int, year: int = 2025) -> list[TaSmsMaestro]:
+def generar_registros(num_registros: int, fecha: datetime.date) -> list[TaSmsMaestro]:
     """
     Genera registros utilizando el modelo SQLAlchemy y validando con Pydantic
     """
     registros = []
-    fecha_base = datetime(year, 1, 1)
 
     for _ in range(num_registros):
-        nombre = generar_nombre_campana(year)
-        fecha = fecha_base + timedelta(days=_*3)
+        nombre = generar_nombre_campana(fecha.year)
         
         # Crear datos usando el schema Pydantic para validación
         registro_data = {
-            'fecha': fecha.date(),
+            'fecha': fecha,
             'nombre': nombre,
             'estado': random.choice(estados),
             'descripcion': generar_descripcion(nombre)
@@ -114,14 +112,14 @@ def generar_registros(num_registros: int, year: int = 2025) -> list[TaSmsMaestro
 
     return registros
 
-def seed_database(num_registros: int, detalles_por_maestro: int, year: int = 2025):
+def seed_database(num_registros: int, detalles_por_maestro: int, fecha: datetime.date):
     """
     Inserta los registros maestros y sus detalles en la base de datos
     """
     db = Session()
     try:
         # Generar y guardar registros maestros
-        registros = generar_registros(num_registros, year)
+        registros = generar_registros(num_registros, fecha)
         db.add_all(registros)
         db.commit()
         print(f"✓ Se generaron {num_registros} registros maestros exitosamente")
