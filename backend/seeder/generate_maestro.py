@@ -53,7 +53,8 @@ variables = {
     "periodo": ["Mensual", "Trimestral", "Semestral", "Anual"]
 }
 
-estados = ["ACTIVO", "PAUSADO", "COMPLETADO"]
+estados = ["EN PROCESO", "PENDIENTE", "COMPLETADO"]
+#ESTADOS DE LOS REPORTES
 
 def generar_nombre_campana(year):
     tipo = random.choice(list(tipos_campanas.keys()))
