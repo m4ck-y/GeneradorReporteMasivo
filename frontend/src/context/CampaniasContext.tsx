@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 import { http } from '../api/http';
+import { ReportStatus } from '../types/reports';
 
 interface Campania {
   id: number;
@@ -32,6 +33,10 @@ interface CampaniasContextType {
   fechaSelected: string | null;
   setFechaSelected: (fecha: string | null) => void;
   buscarCampanias: (fecha: string, page?: number, pageSize?: number) => Promise<void>;
+  generatingReports: boolean;
+  setGeneratingReports: (generating: boolean) => void;
+  checkReportStatus: (campaignId: number) => Promise<ReportStatus>;
+  downloadReport: (filePath: string) => Promise<void>;
 }
 
 const CampaniasContext = createContext<CampaniasContextType | undefined>(undefined);
@@ -46,6 +51,7 @@ export const CampaniasProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     pageSize: 10,
     totalPages: 0
   });
+  const [generatingReports, setGeneratingReports] = useState(false);
 
   const buscarCampanias = async (fecha: string, page: number = 1, pageSize: number = 10) => {
     setLoading(true);
@@ -72,6 +78,28 @@ export const CampaniasProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   };
 
+  const checkReportStatus = async (campaignId: number): Promise<ReportStatus> => {
+    const response = await http.get<ReportStatus>(`/reporte/status/${campaignId}`);
+    return response.value!;
+  };
+
+  const downloadReport = async (filePath: string) => {
+    try {
+      const response = await http.get('/reports/download', { path: filePath }, true);
+      if (response.value) {
+        const url = window.URL.createObjectURL(new Blob([response.value as any]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', filePath.split('/').pop() || 'reporte.csv');
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      }
+    } catch (error) {
+      console.error('Error descargando reporte:', error);
+    }
+  };
+
   return (
     <CampaniasContext.Provider value={{
       campanias,
@@ -82,7 +110,11 @@ export const CampaniasProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setPagination,
       fechaSelected,
       setFechaSelected,
-      buscarCampanias
+      buscarCampanias,
+      generatingReports,
+      setGeneratingReports,
+      checkReportStatus,
+      downloadReport,
     }}>
       {children}
     </CampaniasContext.Provider>

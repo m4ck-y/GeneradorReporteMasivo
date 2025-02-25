@@ -1,7 +1,8 @@
 from fastapi import FastAPI, APIRouter, Depends, HTTPException, BackgroundTasks
 from utils.fecha import convertir_fecha
 import datetime
-from models.database import get_db, Session
+from models.database import get_db
+from sqlalchemy.orm import Session
 from tasks.report_generator import ReportGenerator
 from models.report_status import ReporteEstado
 from models.ta_sms_maestro import TaSmsMaestro
@@ -66,6 +67,9 @@ class ReporteService:
                 TaSmsMaestro.fecha == fecha.date()
             ).all()
 
+
+            print("generando reportes para:", len(campanias))
+
             if not campanias:
                 raise HTTPException(
                     status_code=404,
@@ -82,11 +86,16 @@ class ReporteService:
                 )
                 reportes_estado.append(reporte_estado)
 
+            print("for done")
+
             db.add_all(reportes_estado)
             db.commit()
 
+            print("commited all")
+
             # Agregar tareas en segundo plano para cada campaña
             for campana in campanias:
+                print("agregando tarea para:", campana.id)
                 background_tasks.add_task(
                     self.process_campaign_report,
                     db,

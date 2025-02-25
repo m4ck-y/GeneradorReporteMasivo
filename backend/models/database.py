@@ -9,7 +9,7 @@ Base = declarative_base()
 SQLALCHEMY_DATABASE_URL = "sqlite:///./data.db"  # Ejemplo con SQLite
 
 # Creando el motor de conexión
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}, echo=True)
 
 # Creando la sesión de la base de datos
 Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)

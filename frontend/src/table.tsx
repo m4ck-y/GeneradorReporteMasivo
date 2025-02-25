@@ -1,5 +1,5 @@
 import React from 'react';
-import { Space, Table, Tag, Button, Tooltip } from 'antd';
+import { Space, Table, Tag, Button, Tooltip, message } from 'antd';
 import type { TableProps } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import { useCampanias } from './context/CampaniasContext';
@@ -13,91 +13,90 @@ interface Campania {
   descripcion?: string;
 }
 
-const columns: TableProps<Campania>['columns'] = [
-  {
-    title: 'ID',
-    dataIndex: 'id',
-    key: 'id',
-    width: '10%',
-  },
-  {
-    title: 'Nombre',
-    dataIndex: 'nombre',
-    key: 'nombre',
-    width: '25%',
-  },
-  {
-    title: 'Descripción',
-    dataIndex: 'descripcion',
-    key: 'descripcion',
-    width: '30%',
-  },
-  {
-    title: 'Estado',
-    dataIndex: 'estado',
-    key: 'estado',
-    width: '15%',
-    render: (estado: string) => {
-      let color = 'green';
-      if (estado === 'EN PROCESO') color = 'orange';
-      if (estado === 'PENDIENTE') color = 'gold';
-      if (estado === 'COMPLETADO') color = 'blue';
-      return <Tag color={color}>{estado}</Tag>;
-    },
-  },
-  {
-    title: 'Acciones',
-    key: 'action',
-    width: '20%',
-    render: (_, record) => (
-      <Space size="middle">
-        <Tooltip title={record.estado !== 'COMPLETADO' ? 'El reporte aún no está disponible' : 'Descargar reporte'}>
-          <Button
-            type="primary"
-            icon={<DownloadOutlined />}
-            disabled={record.estado !== 'COMPLETADO'}
-            onClick={() => handleDownloadReport(record.id)}
-            size="small"
-          >
-            Descargar
-          </Button>
-        </Tooltip>
-      </Space>
-    ),
-  },
-];
-
-const handleDownloadReport = async (id: number) => {
-  try {
-    const response = await http.get(`/reports/campaign/${id}`, {}, true);
-    if (response.value) {
-      const url = window.URL.createObjectURL(new Blob([response.value as any]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `reporte_campania_${id}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    }
-  } catch (error) {
-    console.error('Error descargando reporte:', error);
-  }
-};
-
 const TableComponent: React.FC = () => {
   const { 
     campanias, 
     loading, 
-    pagination, 
-    buscarCampanias,
-    fechaSelected
+    pagination,
+    checkReportStatus,
+    downloadReport,
+    fechaSelected,
+    buscarCampanias
   } = useCampanias();
+
+  const handleDownloadReport = async (id: number) => {
+    try {
+      const status = await checkReportStatus(id);
+      if (status.estado === 'COMPLETADO' && status.ruta_archivo) {
+        await downloadReport(status.ruta_archivo);
+      } else {
+        message.info('El reporte aún no está disponible');
+      }
+    } catch (error) {
+      message.error('Error descargando el reporte');
+      console.error('Error:', error);
+    }
+  };
 
   const handleTableChange = (page: number, pageSize: number) => {
     if (fechaSelected) {
       buscarCampanias(fechaSelected, page, pageSize);
     }
   };
+
+  const columns: TableProps<Campania>['columns'] = [
+    {
+      title: 'ID',
+      dataIndex: 'id',
+      key: 'id',
+      width: '10%',
+    },
+    {
+      title: 'Nombre',
+      dataIndex: 'nombre',
+      key: 'nombre',
+      width: '25%',
+    },
+    {
+      title: 'Descripción',
+      dataIndex: 'descripcion',
+      key: 'descripcion',
+      width: '30%',
+    },
+    {
+      title: 'Estado',
+      dataIndex: 'estado',
+      key: 'estado',
+      width: '15%',
+      render: (estado: string) => {
+        let color = 'green';
+        if (estado === 'EN PROCESO') color = 'orange';
+        if (estado === 'PENDIENTE') color = 'gold';
+        if (estado === 'COMPLETADO') color = 'blue';
+        return <Tag color={color}>{estado}</Tag>;
+      },
+    },
+    {
+      title: 'Acciones',
+      key: 'action',
+      width: '20%',
+      render: (_, record) => (
+        <Space size="middle">
+          <Tooltip title={record.estado !== 'COMPLETADO' ? 'El reporte aún no está disponible' : 'Descargar reporte'}>
+            <Button
+              type="primary"
+              icon={<DownloadOutlined />}
+              disabled={record.estado !== 'COMPLETADO'}
+              onClick={() => handleDownloadReport(record.id)}
+              size="small"
+            >
+              Descargar
+            </Button>
+          </Tooltip>
+        </Space>
+      ),
+    },
+  ];
 
   return (
     <Table<Campania>
