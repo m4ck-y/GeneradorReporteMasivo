@@ -22,7 +22,7 @@ SQLALCHEMY_DATABASE_URL = f"postgresql://{BD_USER}:{BD_PASS}@{BD_HOST}:{BD_PORT}
 print("URL:", SQLALCHEMY_DATABASE_URL)
 
 # Creando el motor de conexión
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}, echo=True)
+engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=True)
 
 # Creando la sesión de la base de datos
 Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)

@@ -122,3 +122,46 @@ python --version
 # Listar paquetes instalados
 pip list
 ```
+
+# Guía de instalación de psycopg2
+
+## Consideraciones previas
+Al instalar psycopg2, es posible encontrar el siguiente mensaje:
+```bash
+Error: pg_config executable not found.
+```
+Este documento proporciona los pasos para resolver esta y otras situaciones comunes.
+
+## Requisitos del sistema
+
+Para una instalación exitosa de `psycopg2`, es recomendable asegurarse de contar con:
+
+1. **Sistema Operativo**: Linux (Ubuntu)
+2. **Python**: Python 3.x (preferentemente la versión más reciente)
+3. **PostgreSQL**: Acceso a PostgreSQL y sus bibliotecas de desarrollo
+4. **Herramientas de compilación**: Componentes necesarios para compilar paquetes en C
+
+### Preparación del entorno
+
+Para asegurar una instalación correcta, es recomendable tener instalados los siguientes componentes:
+
+#### 1. Paquete de desarrollo de Python
+Necesario para la compilación de extensiones de Python en C:
+
+```bash
+sudo apt-get install python3-dev
+```
+
+#### 2. Herramientas de compilación (build-essential)
+Facilita la compilación de código en C en el sistema:
+
+```bash
+sudo apt-get install build-essential
+```
+
+#### 3. Dependencias de PostgreSQL
+Proporciona las bibliotecas de desarrollo necesarias, incluyendo pg_config:
+
+```bash
+sudo apt-get install libpq-dev
+```
