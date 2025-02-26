@@ -54,10 +54,10 @@ Para poner en marcha el servidor de desarrollo:
 cd backend
 
 # Iniciar el servidor con recarga automática
-uvicorn main:app --reload
+uvicorn main:app --host 0.0.0.0 --port 8080 --reload
 ```
 
-El servicio estará disponible en: `http://localhost:8000`
+El servicio estará disponible en: `http://localhost:8080`
 
 ## Estructura del Proyecto
 

@@ -3,7 +3,6 @@ import { Space, Table, Tag, Button, Tooltip, message } from 'antd';
 import type { TableProps } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import { useCampanias } from './context/CampaniasContext';
-import { http } from './api/http';
 
 interface Campania {
   id: number;

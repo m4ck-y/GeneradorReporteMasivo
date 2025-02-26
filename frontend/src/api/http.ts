@@ -1,4 +1,4 @@
-import { RequestOptions, ApiResponse } from '../types/api';
+import { ApiResponse } from '../types/api';
 
 const BASE_URL = import.meta.env.VITE_IP_BACKEND_MAIN;
 
