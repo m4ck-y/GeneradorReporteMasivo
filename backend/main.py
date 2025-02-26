@@ -6,6 +6,10 @@ from models.ta_sms_detalle import TaSmsDetalle
 from models.ta_sms_maestro import TaSmsMaestro
 from models.report_status import ReporteEstado
 from api import setup_services
+from dotenv import load_dotenv
+
+# Cargar las variables de entorno desde el archivo .env
+load_dotenv()
 
 app = FastAPI()
 setup_services(app)

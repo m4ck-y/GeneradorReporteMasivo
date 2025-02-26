@@ -2,6 +2,8 @@ from seeder.generate_maestro import seed_database
 from models.database import Base, engine, Session
 from models.ta_sms_maestro import TaSmsMaestro
 from models.ta_sms_detalle import TaSmsDetalle
+from models.report_status import ReporteEstado
+import shutil
 from datetime import datetime
 from sqlalchemy import text
 
@@ -26,10 +28,12 @@ def limpiar_tablas():
         # Eliminar registros de detalles primero debido a la restricción de clave foránea
         db.query(TaSmsDetalle).delete()
         db.query(TaSmsMaestro).delete()
-        
+        db.query(ReporteEstado).delete()
+
         # Reiniciar las secuencias de ID en PostgreSQL
-        #db.execute(text("ALTER SEQUENCE ta_sms_detalle_id_seq RESTART WITH 1"))
-        #db.execute(text("ALTER SEQUENCE ta_sms_maestro_id_seq RESTART WITH 1"))
+        db.execute(text("ALTER SEQUENCE ta_sms_detalle_id_seq RESTART WITH 1"))
+        db.execute(text("ALTER SEQUENCE ta_sms_maestro_id_seq RESTART WITH 1"))
+        db.execute(text("ALTER SEQUENCE report_status_id_seq RESTART WITH 1"))
         
         db.commit()
         print("✓ Registros anteriores eliminados exitosamente")
@@ -49,6 +53,9 @@ def run_seeder():
         
         # Limpiar registros existentes
         limpiar_tablas()
+
+        # Eliminar la carpeta y su contenido
+        shutil.rmtree("./reports")
         
         # Fecha actual en formato yy/mm/dd
         fecha_actual = datetime.now().strftime('%y/%m/%d')
