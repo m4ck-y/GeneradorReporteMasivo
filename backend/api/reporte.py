@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from tasks.report_generator import ReportGenerator
 from models.report_status import ReporteEstado
 from models.ta_sms_maestro import TaSmsMaestro
-from sqlalchemy import and_
+from sqlalchemy import and_, text
 
 ROUTE_NAME = 'reporte'
 
@@ -63,10 +63,16 @@ class ReporteService:
         """Genera reportes CSV para todas las campañas en una fecha específica"""
         try:
             # Buscar campañas de la fecha
-            campanias = db.query(TaSmsMaestro).filter(
-                TaSmsMaestro.fecha == fecha.date()
-            ).all()
-
+            campanias = db.execute(
+            text("""
+                    SELECT * FROM get_campanias_by_fecha(:fecha, NULL, NULL);
+                """),
+                {
+                "fecha": fecha.date(),
+                "page": None,
+                "page_size": None
+                }
+                ).fetchall()
 
             print("generando reportes para:", len(campanias))
 

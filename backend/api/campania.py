@@ -21,12 +21,8 @@ class CampaniaService:
         api_server.include_router(self.api_router)
 
     def setup_routes(self):
-        self.api_router.get('/list')(self.list_campanias)#listar todas las campañas
         self.api_router.get('/list/')(self.list_campanias_fecha)#listar las campañas por fecha y paginacion
         self.api_router.get('/fechas')(self.obtener_fechas)#obtener todas las fechas distintas donde existen campañas
-
-    async def list_campanias(self, db: Session = Depends(get_db)):
-        return db.query(TaSmsMaestro).all()
     
     async def list_campanias_fecha(
         self,
