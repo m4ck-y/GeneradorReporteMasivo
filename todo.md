@@ -1,6 +1,2 @@
-export requirements.txt
-stores procedures
-frontdowload
-rabbitMQ
-
-libreria: python-dotenv, psycopg2
+front dowload .csv
+rabbitMQ vs kafka

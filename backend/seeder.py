@@ -1,3 +1,4 @@
+import os
 from seeder.generate_maestro import seed_database
 from models.database import Base, engine, Session
 from models.ta_sms_maestro import TaSmsMaestro
@@ -31,9 +32,34 @@ def limpiar_tablas():
         db.query(ReporteEstado).delete()
 
         # Reiniciar las secuencias de ID en PostgreSQL
-        db.execute(text("ALTER SEQUENCE ta_sms_detalle_id_seq RESTART WITH 1"))
-        db.execute(text("ALTER SEQUENCE ta_sms_maestro_id_seq RESTART WITH 1"))
-        db.execute(text("ALTER SEQUENCE report_status_id_seq RESTART WITH 1"))
+        # Verificar si la secuencia existe antes de reiniciarla
+        # Para evitar el error cuando la secuencia no existe
+        db.execute(text(""" 
+            DO $$ 
+            BEGIN
+                IF EXISTS (SELECT 1 FROM pg_class WHERE relname = 'TA_SMS_DETALLE_id_seq' AND relkind = 'S') THEN
+                    ALTER SEQUENCE "TA_SMS_DETALLE_id_seq" RESTART WITH 1;
+                END IF;
+            END $$;
+        """))
+
+        db.execute(text(""" 
+            DO $$ 
+            BEGIN
+                IF EXISTS (SELECT 1 FROM pg_class WHERE relname = 'TA_SMS_MAESTRO_id_seq' AND relkind = 'S') THEN
+                    ALTER SEQUENCE "TA_SMS_MAESTRO_id_seq" RESTART WITH 1;
+                END IF;
+            END $$;
+        """))
+
+        db.execute(text(""" 
+            DO $$ 
+            BEGIN
+                IF EXISTS (SELECT 1 FROM pg_class WHERE relname = 'reporte_estado_id_seq' AND relkind = 'S') THEN
+                    ALTER SEQUENCE "reporte_estado_id_seq" RESTART WITH 1;
+                END IF;
+            END $$;
+        """))
         
         db.commit()
         print("✓ Registros anteriores eliminados exitosamente")
@@ -55,7 +81,8 @@ def run_seeder():
         limpiar_tablas()
 
         # Eliminar la carpeta y su contenido
-        shutil.rmtree("./reports")
+        if os.path.exists("./reports"):
+            shutil.rmtree("./reports")
         
         # Fecha actual en formato yy/mm/dd
         fecha_actual = datetime.now().strftime('%y/%m/%d')

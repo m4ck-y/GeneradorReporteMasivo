@@ -1,6 +1,8 @@
 # Backend - Generador de Reportes Masivos
 
-## Requisitos Previos
+## Requisitos del Sistema
+
+Para el correcto funcionamiento del proyecto, es necesario contar con:
 
 - Python 3.10 o superior
 - PostgreSQL 14 o superior
@@ -8,118 +10,126 @@
 
 ## Configuración del Entorno de Desarrollo
 
-### 1. Crear y Activar Entorno Virtual
+### 1. Entorno Virtual
+
+Es recomendable crear y activar un entorno virtual para aislar las dependencias:
 
 ```bash
-# Crear entorno virtual
+# Creación del entorno virtual
 python -m venv .venv
 
-# Activar entorno virtual
-# En Windows:
+# Activación del entorno virtual
+# Para Windows:
 .venv\Scripts\activate
-# En Linux/Mac:
+# Para Linux/Mac:
 source .venv/bin/activate
 ```
 
-### 2. Instalar Dependencias
+### 2. Dependencias del Proyecto
+
+Para instalar las dependencias necesarias:
 
 ```bash
-# Instalar dependencias principales
-pip install fastapi
-pip install uvicorn
-pip install sqlalchemy
-pip install pydantic
+# Instalación de componentes principales
+pip install fastapi uvicorn sqlalchemy pydantic
 
-# Exportar dependencias a requirements.txt
+# Para gestionar las dependencias, se puede:
+# Exportar la lista de dependencias actual
 pip freeze > requirements.txt
 
-# O instalar todas las dependencias desde requirements.txt
+# O instalar desde un archivo existente
 pip install -r requirements.txt
 ```
 
 ### 3. Configuración de Base de Datos
 
-Crear archivo `.env` en la raíz del proyecto:
+Es necesario crear un archivo `.env` en la raíz del proyecto con las credenciales correspondientes.
 
-### 4. Ejecutar el Proyecto
+### 4. Iniciar el Servidor
+
+Para poner en marcha el servidor de desarrollo:
 
 ```bash
-# Ubicarse en la carpeta backend
+# Ubicarse en el directorio backend
 cd backend
 
-# Ejecutar el servidor de desarrollo
+# Iniciar el servidor con recarga automática
 uvicorn main:app --reload
 ```
 
-El servidor estará disponible en: `http://localhost:8000`
+El servicio estará disponible en: `http://localhost:8000`
 
 ## Estructura del Proyecto
 
+La organización del código sigue una estructura modular:
+
 ```
 backend/
-├── models/             # Modelos SQLAlchemy
-│   ├── database.py    # Configuración de base de datos
+├── models/             # Definiciones de modelos SQLAlchemy
+│   ├── database.py    # Configuración de conexión a base de datos
 │   ├── ta_sms_maestro.py
 │   └── ta_sms_detalle.py
-├── schemas/           # Esquemas Pydantic
+├── schemas/           # Esquemas de validación Pydantic
 │   ├── ta_sms_maestro.py
 │   └── ta_sms_detalle.py
 ├── seeder/           # Generadores de datos de prueba
 │   ├── generate_maestro.py
 │   └── generate_details.py
-├── tasks/            # Tareas y utilidades
+├── tasks/            # Utilidades y tareas
 │   └── report_generator.py  # Generador de reportes
 ├── main.py          # Punto de entrada de la aplicación
-├── seeder.py        # Script para generar datos de prueba
-└── requirements.txt  # Dependencias del proyecto
+├── seeder.py        # Script para datos de prueba
+└── requirements.txt  # Listado de dependencias
 ```
 
-## Generar Datos de Prueba
+## Generación de Datos de Prueba
+
+Para facilitar el desarrollo y pruebas, se incluye un generador de datos:
 
 ```bash
-# Ejecutar el seeder interactivo
+# Ejecutar el generador interactivo
 python seeder.py
 
-# El seeder solicitará:
-# - Número de registros maestros (default: 20)
-# - Número de detalles por maestro (default: 20)
-# - Año para los registros (default: 2025)
+# El script solicitará:
+# - Cantidad de registros maestros (predeterminado: 20)
+# - Cantidad de detalles por maestro (predeterminado: 20)
+# - Fecha para los registros (predeterminado: fecha actual)
 
-# Nota: El seeder limpiará todos los registros existentes antes de generar nuevos datos
+# Nota: Este proceso limpiará los datos existentes antes de generar nuevos registros
 ```
 
-## Generación de Reportes
+## Sistema de Reportes
 
-El sistema permite generar diferentes tipos de reportes en formato CSV:
+La aplicación permite generar reportes en formato CSV de dos tipos:
 
-### Tipos de Reportes
-1. **Reporte por Campaña**: Detalle completo de una campaña específica
-2. **Reporte por Fecha**: Genera reportes para todas las campañas de una fecha
+### Tipos de Reportes Disponibles
+1. **Reporte por Campaña**: Información detallada de una campaña específica
+2. **Reporte por Fecha**: Consolidado de todas las campañas en una fecha determinada
 
-Los reportes se guardan en el directorio `reports/` con la siguiente nomenclatura:
-- Campaña: `campaign_[ID]_[TIMESTAMP].csv`
-- Resumen: `summary_report_[FECHA]_[TIMESTAMP].csv`
+Los archivos generados se almacenan en el directorio `reports/` siguiendo la nomenclatura:
+- Campaña individual: `campaign_[ID]_[TIMESTAMP].csv`
+- Reporte consolidado: `summary_report_[FECHA]_[TIMESTAMP].csv`
 
-## Documentación API
+## Documentación de la API
 
-Una vez ejecutado el servidor, puedes acceder a:
+La documentación interactiva está disponible en:
 
-- Documentación Swagger UI: `http://localhost:8000/docs`
+- Interfaz Swagger UI: `http://localhost:8000/docs`
 - Documentación ReDoc: `http://localhost:8000/redoc`
 
-## Comandos Útiles
+## Comandos de Referencia
 
 ```bash
-# Actualizar requirements.txt
+# Actualización del archivo de dependencias
 pip freeze > requirements.txt
 
-# Instalar nuevas dependencias desde requirements.txt
+# Instalación de dependencias
 pip install -r requirements.txt
 
-# Verificar versión de Python
+# Verificación de versión de Python
 python --version
 
-# Listar paquetes instalados
+# Visualización de paquetes instalados
 pip list
 ```
 

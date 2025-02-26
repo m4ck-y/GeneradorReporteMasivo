@@ -1,62 +1,128 @@
-### 1. Crear la base de datos:
+# Configuración de Base de Datos
 
-- Primero, debes crear la base de datos antes de asignarle permisos al usuario.
+## 1. Crear la base de datos
 
-sql
-Copiar
+```sql
 CREATE DATABASE report_generator;
-### 2. Crear el usuario:
+```
 
-Luego, puedes crear el usuario con la contraseña especificada.
+## 2. Crear el usuario
 
-sql
-Copiar
+```sql
 CREATE USER u_report WITH PASSWORD '1234567890';
-### 3. Conceder permisos de conexión y creación a nivel de base de datos:
+```
 
-Ahora, le das permisos al usuario para conectarse a la base de datos y crear objetos dentro de ella.
+## 3. Conceder permisos básicos
 
-sql
-Copiar
+```sql
 GRANT CONNECT ON DATABASE report_generator TO u_report;
 GRANT CREATE ON DATABASE report_generator TO u_report;
-### 4. Permitir uso y permisos sobre todas las tablas del esquema `public`:
-
-Permites que el usuario realice operaciones como `SELECT`, `INSERT`, `UPDATE`, y `DELETE` sobre todas las tablas en el esquema `public`.
-
-sql
-Copiar
 GRANT USAGE, SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO u_report;
-### 5. Permitir crear objetos dentro del esquema `public`:
-
-También le das permisos para crear objetos (como nuevas tablas, vistas, procedimientos almacenados, etc.) en el esquema `public`.
-
-sql
-Copiar
 GRANT CREATE ON SCHEMA public TO u_report;
-### 6. Permitir crear procedimientos almacenados, vistas y triggers:
+```
 
-Si quieres que el usuario también pueda crear procedimientos almacenados, vistas y triggers, necesitarías darle los permisos apropiados. A continuación, algunos ejemplos de permisos adicionales que podrías otorgar:
+## 4. Procedimientos Almacenados
 
-sql
-Copiar
-GRANT CREATE ON SCHEMA public TO u_report;
-GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO u_report;
-GRANT TRIGGER ON ALL TABLES IN SCHEMA public TO u_report;
-### 7. Verificar los permisos y roles del usuario:
+### Procedimiento para listar campañas con paginación
 
-Para comprobar qué permisos tiene un usuario o qué roles están asignados a un usuario en particular, puedes usar los siguientes comandos:
+```sql
+CREATE OR REPLACE FUNCTION get_campanias_by_fecha(
+    p_fecha_in DATE,  -- Parámetro de entrada
+    p_page INTEGER DEFAULT 1,  -- Número de página
+    p_page_size INTEGER DEFAULT 10  -- Tamaño de página
+)
+RETURNS TABLE(
+    id INTEGER, 
+    nombre TEXT, 
+    fecha DATE, 
+    estado TEXT, 
+    descripcion TEXT,
+    total_registros BIGINT,
+    total_paginas INTEGER
+) 
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_total_registros BIGINT;
+    v_total_paginas INTEGER;
+    v_offset INTEGER;
+BEGIN
+    -- Calcular el total de registros
+    SELECT COUNT(*) INTO v_total_registros
+    FROM "TA_SMS_MAESTRO" m
+    WHERE m.fecha = p_fecha_in;  -- Aquí usamos "m.fecha" para referirnos a la columna
 
-sql
-Copiar
+    -- Calcular el total de páginas
+    v_total_paginas := CEIL(v_total_registros::float / p_page_size);
+
+    -- Calcular el offset para la paginación
+    v_offset := (p_page - 1) * p_page_size;
+
+    -- Retornar los resultados con la paginación
+    RETURN QUERY
+    SELECT
+        m.id,
+        m.nombre::TEXT,
+        m.fecha,
+        m.estado::TEXT,
+        m.descripcion::TEXT,
+        v_total_registros AS total_registros,
+        v_total_paginas AS total_paginas
+    FROM "TA_SMS_MAESTRO" m
+    WHERE m.fecha = p_fecha_in  -- Nuevamente, usando "m.fecha"
+    ORDER BY m.id
+    LIMIT p_page_size
+    OFFSET v_offset;
+
+END;
+$$;
+```
+
+### Uso del procedimiento
+
+```sql
+-- Ejemplo 1: Obtener primera página (10 registros)
+BEGIN;
+CALL get_campanias_by_fecha('2024-03-20', 1, 10, 'resultados');
+FETCH ALL IN "resultados";
+COMMIT;
+
+-- Ejemplo 2: Obtener segunda página con 20 registros por página
+BEGIN;
+CALL get_campanias_by_fecha('2024-03-20', 2, 20, 'resultados');
+FETCH ALL IN "resultados";
+COMMIT;
+
+-- Ejemplo 3: Usar valores por defecto
+BEGIN;
+CALL get_campanias_by_fecha('2024-03-20', p_result := 'resultados');
+FETCH ALL IN "resultados";
+COMMIT;
+```
+
+## 5. Verificar permisos
+
+```sql
+-- Verificar permisos del usuario
 SELECT d.datname, r.rolname, r.rolsuper, r.rolcreaterole, r.rolcreatedb
 FROM pg_database d
-JOIN pg_roles r ON r.rolname = 'u_report'  -- Cambia esto por el nombre de tu usuario
+JOIN pg_roles r ON r.rolname = 'u_report'
 WHERE d.datistemplate = false;
 
-- También puedes listar las bases de datos y los roles usando estos comandos:
+-- Listar bases de datos y roles
+\l    -- Listar bases de datos
+\du   -- Listar roles de usuarios
+```
 
-sql
-Copiar
-\l    -- Listar las bases de datos
-\du   -- Listar los roles de usuarios
+## 6. Permisos adicionales para procedimientos
+
+```sql
+-- Permisos para ejecutar procedimientos
+GRANT EXECUTE ON PROCEDURE get_campanias_by_fecha(date, integer, integer, refcursor) TO u_report;
+```
+
+### Notas:
+- El procedimiento almacenado maneja la paginación de forma eficiente en la base de datos
+- Retorna información adicional como total de registros y páginas
+- Incluye parámetros opcionales para página y tamaño de página
+- Los resultados se ordenan por ID de campaña
