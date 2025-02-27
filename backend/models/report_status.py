@@ -7,24 +7,16 @@ class ReporteEstado(Base):
     """
     __tablename__ = 'reporte_estado'  # Nombre de la tabla en la base de datos
 
-    # Identificador único de la fila (clave primaria)
-    id = Column(Integer, primary_key=True, autoincrement=True, comment="Identificador único de la fila del reporte")
+    id = Column(Integer, primary_key=True, autoincrement=True)
 
-    # id_campaña: Identificador único de la campaña para la cual se genera el reporte.
-    # Este campo puede ser una clave foránea si deseas relacionarlo con otra tabla (por ejemplo, TA_SMS_MAESTRO)
-    id_campana = Column(Integer, nullable=False, comment="Identificador único de la campaña asociada al reporte")
+    id_campana = Column(Integer, nullable=False)
 
-    # fecha: Fecha en la que se solicitó el reporte (formato YYYY-MM-DD)
-    fecha = Column(Date, nullable=False, comment="Fecha en la que se solicitó el reporte")
+    # fecha: Fecha de ta_sms_maestro (formato YYYY-MM-DD)//pasado como parametro desde el front
+    fecha = Column(Date, nullable=False)
 
     # estado: Estado actual del reporte. Puede ser "Pendiente", "En proceso", "Completado" o "Error"
-    estado = Column(String(50), nullable=False, comment="Estado del reporte (Pendiente, En proceso, Completado)")
+    estado = Column(String(50), nullable=False)
 
-    # ruta_archivo: Ruta (o URL) donde se encuentra almacenado el archivo CSV generado.
-    # Este campo es opcional y se llenará cuando el reporte esté completado.
-    ruta_archivo = Column(String(255), nullable=True, comment="Ruta del archivo CSV generado (si está disponible)")
+    ruta_archivo = Column(String(255), nullable=True)
 
-    # timestamp: Fecha y hora de la última actualización de este registro.
-    # Se actualiza automáticamente cada vez que se modifica la fila.
-    timestamp = Column(DateTime, server_default=func.now(), onupdate=func.now(),
-                       comment="Fecha y hora de la última actualización del estado del reporte")
+    timestamp = Column(DateTime, server_default=func.now(), onupdate=func.now())
