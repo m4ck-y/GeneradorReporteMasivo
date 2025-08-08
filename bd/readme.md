@@ -78,6 +78,31 @@ END;
 $$;
 ```
 
+
+## Funcion
+
+Consulta los registros de TA_SMS_MAESTRO que no tienen un reporte en reporte_estado
+CREATE OR REPLACE FUNCTION obtener_maestros_sin_reporte(fecha_param DATE)
+RETURNS TABLE (
+    maestro_id INT,
+    maestro_nombre TEXT,
+    maestro_fecha DATE,
+    estado_reporte TEXT,
+    ruta_archivo TEXT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT maestro.id, maestro.nombre, maestro.fecha, estado.estado, estado.ruta_archivo
+    FROM TA_SMS_MAESTRO maestro
+    LEFT JOIN reporte_estado estado 
+        ON maestro.id = estado.id_campana AND maestro.fecha = estado.fecha
+    WHERE maestro.fecha = fecha_param
+    AND estado.id IS NULL;  -- Solo los maestros sin reporte
+END;
+$$ LANGUAGE plpgsql;
+
+
+
 ### Uso del procedimiento
 
 ```sql
